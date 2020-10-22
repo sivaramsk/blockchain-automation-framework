@@ -1,0 +1,48 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: anchorpeer-allchannel-org2
+  namespace: org2-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: anchorpeer-allchannel-org2
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/anchorpeer
+  values:
+    metadata:
+      namespace: org2-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.0.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.org2-net:7051
+      localmspid: org2MSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: org2-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/org2-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/org2-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: allchannel      
+    orderer:
+      address: orderer1.ordorg-net:7050
+    anchorstx: |-
+      CsICChgKFggCGgYIiYzH/AUiCmFsbGNoYW5uZWwSpQIKogIKCmFsbGNoYW5uZWwSYBJeCgtBcHBs
+      aWNhdGlvbhJPCAESSwoHb3JnMk1TUBJAGgcKA01TUBIAIgsKB1dyaXRlcnMSACIKCgZBZG1pbnMS
+      ACIPCgtFbmRvcnNlbWVudBIAIgsKB1JlYWRlcnMSABqxARKuAQoLQXBwbGljYXRpb24SngEIARKZ
+      AQoHb3JnMk1TUBKNAQgBGgcKA01TUBIAGkEKC0FuY2hvclBlZXJzEjISKAomCiFwZWVyMC5vcmcy
+      LW5ldC5iYW5rZW1hLmVtdWx5YS5jb20Q+0EaBkFkbWlucyILCgdSZWFkZXJzEgAiCwoHV3JpdGVy
+      cxIAIgoKBkFkbWlucxIAIg8KC0VuZG9yc2VtZW50EgAqBkFkbWlucw==
+
