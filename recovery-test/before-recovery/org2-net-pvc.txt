@@ -1,0 +1,7 @@
+NAME                      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+ca-server-db-pvc          Bound    pvc-638fe038-ddfc-4011-b641-2eeb04a226c8   1Gi        RWO            org2sc         8h
+ca-tools-crypto-pvc       Bound    pvc-bca6fb16-7184-4e5d-bfe0-81ab6eb6667d   1Gi        RWO            org2sc         8h
+ca-tools-pvc              Bound    pvc-967824dc-5951-44d3-8559-0e7c3d8ba5ed   1Gi        RWO            org2sc         8h
+datadir-couchdb-peer0-0   Bound    pvc-326749a7-0acd-4e90-a0e2-e96c55e85a05   1Gi        RWO            org2sc         8h
+datadir-peer0-0           Bound    pvc-27bf16f5-f605-4288-85bf-0f8ca3918a0b   1Gi        RWO            org2sc         8h
+peer0-cli-pvc             Bound    pvc-a598554c-5b63-4280-87a7-600e3938cf00   1Gi        RWO            org2sc         8h
