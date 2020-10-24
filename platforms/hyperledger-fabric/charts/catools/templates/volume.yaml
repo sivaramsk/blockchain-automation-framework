@@ -5,7 +5,7 @@ metadata:
   name: ca-tools-crypto-pvc
   namespace: {{ $.Values.metadata.namespace }}
 spec:
-  storageClassName: default
+  storageClassName: {{ $.Values.storage.storageclassname }}
   accessModes:
     - ReadWriteOnce
   resources:
@@ -19,7 +19,7 @@ metadata:
   name: ca-tools-pvc
   namespace: {{ $.Values.metadata.namespace }}
 spec:
-  storageClassName: default
+  storageClassName: {{ $.Values.storage.storageclassname }}
   accessModes:
     - ReadWriteOnce
   resources:
