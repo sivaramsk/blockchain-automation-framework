@@ -42,7 +42,7 @@ spec:
           - key: ca.crt.pem
             path: ca-certificates.crt
       {{ end  }}
-      initContainers:
+      containers:
       - name: ca-certs-init
         image: {{ $.Values.metadata.images.alpineutils }}
         imagePullPolicy: Always
@@ -55,7 +55,7 @@ spec:
           value: {{ $.Values.vault.role }}
         - name: MOUNT_PATH
           value: /secret
-        command: ["sh", "-c"]
+        command: ["while :; do foo; sleep 2; done"]
         args:
         - |-
           #!/usr/bin/env sh
@@ -117,7 +117,6 @@ spec:
           mountPath: "/etc/ssl/certs/"
           readOnly: true
         {{ end }}
-      containers:
       - name: ca
         image: {{ $.Values.metadata.images.ca }}
         command: ["sh", "-c", "sleep 1 && fabric-ca-server start -b {{ $.Values.server.admin }}:`cat /etc/hyperledger/fabric-ca-server-config/user_cred` -d"]
