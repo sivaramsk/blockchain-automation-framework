@@ -1,0 +1,43 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: ordorg-net-ca
+  namespace: ordorg-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: ordorg-net-ca
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: ordorg-net
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.5
+    server:
+      name: ca
+      tlsstatus: true
+      admin: ordorg-admin
+    storage:
+      storageclassname: ordorgsc
+      storagesize: 512Mi 
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: ordorg-net-auth
+      secretcert: secret/crypto/ordererOrganizations/ordorg-net/ca?ca.ordorg-net-cert.pem
+      secretkey: secret/crypto/ordererOrganizations/ordorg-net/ca?ordorg-net-CA.key
+      secretadminpass: secret/credentials/ordorg-net/ca/ordorg?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: orderer
