@@ -42,7 +42,7 @@ spec:
           - key: ca.crt.pem
             path: ca-certificates.crt
       {{ end  }}
-      containers:
+      initContainers:
       - name: ca-certs-init
         image: {{ $.Values.metadata.images.alpineutils }}
         imagePullPolicy: Always
@@ -55,9 +55,59 @@ spec:
           value: {{ $.Values.vault.role }}
         - name: MOUNT_PATH
           value: /secret
-        command: ["sh", "-c", "/bin/bash"]
-        args: [ "while true; do sleep 30; done;" ]
-          
+        command: ["sh", "-c"]
+        args:
+        - |-
+          #!/usr/bin/env sh
+          validateVaultResponse () {
+          if echo ${2} | grep "errors"; then
+           echo "ERROR: unable to retrieve ${1}: ${2}"
+           exit 1
+           fi
+          }
+
+          KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+          echo "Getting secrets from Vault Server: ${VAULT_ADDR}"
+          # Login to Vault and so I can get an approle token
+          VAULT_CLIENT_TOKEN=$(curl -sS --request POST ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_PATH}/login \
+            -H "Content-Type: application/json" \
+            -d '{"role":"'"${VAULT_APP_ROLE}"'","jwt":"'"${KUBE_SA_TOKEN}"'"}' | \
+            jq -r 'if .errors then . else .auth.client_token end')
+          validateVaultResponse 'vault login token' "${VAULT_CLIENT_TOKEN}"
+
+          SECRET_CERT={{ $.Values.vault.secretcert }}
+          vault_secret_key=$(echo ${SECRET_CERT} |awk -F "?" '{print $1}')
+          vault_data_key=$(echo ${SECRET_CERT} |awk -F "?" '{print $2}')
+          LOOKUP_SECRET_RESPONSE=$(curl -sS \
+              --header "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" \
+              ${VAULT_ADDR}/v1/${vault_secret_key} | \
+              jq -r 'if .errors then . else . end')
+          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}"
+          VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data[\"${vault_data_key}\"]")
+          echo "${VALUE_OF_SECRET}" >> ${MOUNT_PATH}/server.crt
+
+          SECRET_KEY={{ $.Values.vault.secretkey }}
+          vault_secret_key=$(echo ${SECRET_KEY} |awk -F "?" '{print $1}')
+          vault_data_key=$(echo ${SECRET_KEY} |awk -F "?" '{print $2}')
+          LOOKUP_SECRET_RESPONSE=$(curl -sS \
+              --header "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" \
+              ${VAULT_ADDR}/v1/${vault_secret_key} | \
+              jq -r 'if .errors then . else . end')
+          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}"
+          VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data[\"${vault_data_key}\"]")
+          echo "${VALUE_OF_SECRET}" >> ${MOUNT_PATH}/server.key
+
+
+          SECRET_ADMIN_PASS={{ $.Values.vault.secretadminpass }}
+          vault_secret_key=$(echo ${SECRET_ADMIN_PASS} |awk -F "?" '{print $1}')
+          vault_data_key=$(echo ${SECRET_ADMIN_PASS} |awk -F "?" '{print $2}')
+          LOOKUP_SECRET_RESPONSE=$(curl -sS \
+              --header "X-Vault-Token: ${VAULT_CLIENT_TOKEN}" \
+          ${VAULT_ADDR}/v1/${vault_secret_key} | jq -r 'if .errors then . else . end')
+          validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}"
+          VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data[\"${vault_data_key}\"]")
+          echo "${VALUE_OF_SECRET}" >> ${MOUNT_PATH}/user_cred
+
 
         volumeMounts:
         - name: certificates
@@ -67,6 +117,7 @@ spec:
           mountPath: "/etc/ssl/certs/"
           readOnly: true
         {{ end }}
+      containers:
       - name: ca
         image: {{ $.Values.metadata.images.ca }}
         command: ["sh", "-c", "sleep 1 && fabric-ca-server start -b {{ $.Values.server.admin }}:`cat /etc/hyperledger/fabric-ca-server-config/user_cred` -d"]
