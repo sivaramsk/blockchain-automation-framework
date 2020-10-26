@@ -55,10 +55,10 @@ spec:
           value: {{ $.Values.vault.role }}
         - name: MOUNT_PATH
           value: /secret
-        command: ["sh", "-c"]
+        command: ["bash", "-c", "-x"]
         args:
         - |-
-          #!/usr/bin/env sh -x
+          #!/usr/bin/env sh
           validateVaultResponse () {
           if echo ${2} | grep "errors"; then
            echo "ERROR: unable to retrieve ${1}: ${2}"
