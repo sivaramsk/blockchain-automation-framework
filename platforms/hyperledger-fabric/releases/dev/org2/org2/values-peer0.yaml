@@ -1,0 +1,63 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: org2-peer0
+  namespace: org2-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: org2-peer0
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/peernode    
+  values:
+    metadata:
+      namespace: org2-net
+      images:
+        couchdb: hyperledger/fabric-couchdb:0.4.18
+        peer: hyperledger/fabric-peer:2.0.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.org2-net:7051
+      gossipexternalendpoint: peer0.org2-net.bankema.emulya.com:8443
+      localmspid: org2MSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.0.0
+      couchdb:
+        username: org2-user
+
+    storage:
+      peer:
+        storageclassname: org2sc
+        storagesize: 512Mi
+      couchdb:
+        storageclassname: org2sc
+        storagesize: 1Gi
+
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: org2-net-auth
+      secretprefix: secret/crypto/peerOrganizations/org2-net/peers/peer0.org2-net
+      secretambassador: secret/crypto/peerOrganizations/org2-net/ambassador
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretcouchdbpass: secret/credentials/org2-net/couchdb/org2?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+          
+    proxy:
+      provider: haproxy
+      external_url_suffix: bankema.emulya.com
