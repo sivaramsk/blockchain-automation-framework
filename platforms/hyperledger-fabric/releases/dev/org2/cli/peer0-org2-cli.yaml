@@ -1,0 +1,38 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: peer0-org2-cli
+  namespace: org2-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: peer0-org2-cli
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: org2-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.0.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: org2sc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: org2-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/org2-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/org2-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer0
+      localmspid: org2MSP
+      tlsstatus: true
+      address: peer0.org2-net:7051
+    orderer:
+      address: orderer1.ordorg-net:7050
