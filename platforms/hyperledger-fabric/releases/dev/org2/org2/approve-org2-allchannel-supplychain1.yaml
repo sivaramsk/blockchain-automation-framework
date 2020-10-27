@@ -1,0 +1,44 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: approve-org2-allchannel-supplychain1
+  namespace: org2-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: approve-org2-allchannel-supplychain1
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/approve_chaincode
+  values:
+    metadata:
+      namespace: org2-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.0.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.org2-net:7051
+      localmspid: org2MSP
+      loglevel: debug
+      tlsstatus: true
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: org2-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/org2-net/users/admin 
+      orderersecretprefix: secret/crypto/peerOrganizations/org2-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    orderer:
+      address: orderer1.ordorg-net:7050
+    chaincode:
+      builder: hyperledger/fabric-ccenv:2.0.0
+      name: supplychain
+      version: 1
+      commitarguments: '\"init\",\"\"'
+      endorsementpolicies:  ''
+    channel:
+      name: allchannel
