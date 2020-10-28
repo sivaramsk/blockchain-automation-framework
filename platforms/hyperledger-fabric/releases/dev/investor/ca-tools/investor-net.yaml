@@ -1,0 +1,28 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: investor-net-ca-tools
+  namespace: investor-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: investor-net-ca-tools
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/catools
+  values:
+    metadata:
+      namespace: investor-net
+      name: ca-tools
+
+    replicaCount: 1
+
+    image:
+      repository: hyperledger/fabric-ca-tools
+      tag: 1.2.1
+      pullPolicy: IfNotPresent
+      
+    storage:
+      storageclassname: investorsc
+      storagesize: 512Mi
