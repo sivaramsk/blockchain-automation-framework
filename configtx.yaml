@@ -1,0 +1,205 @@
+#
+---
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies: &ApplicationDefaultPolicies
+    LifecycleEndorsement:
+        Type: ImplicitMeta
+        Rule: "ANY Endorsement"
+    Endorsement:
+        Type: ImplicitMeta
+        Rule: "ANY Endorsement"
+    Readers:
+        Type: ImplicitMeta
+        Rule: "ANY Readers"
+    Writers:
+        Type: ImplicitMeta
+        Rule: "ANY Writers"
+    Admins:
+        Type: ImplicitMeta
+        Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Organizations:
+
+#
+  - &intainOrg
+    Name: intainMSP
+    ID: intainMSP
+    MSPDir: ./crypto-config/ordererOrganizations/intain-net/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('intainMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('intainMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('intainMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('intainMSP.member')"
+    
+#
+  - &originatorOrg
+    Name: originatorMSP
+    ID: originatorMSP
+    MSPDir: ./crypto-config/peerOrganizations/originator-net/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('originatorMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('originatorMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('originatorMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('originatorMSP.member')"
+          
+    AnchorPeers:
+      # AnchorPeers defines the location of peers which can be used
+      # for cross org gossip communication.  Note, this value is only
+      # encoded in the genesis block in the Application section context
+      - Host: peer0.originator-net.staging.intainabs.emulya.com
+        Port: 8443
+#
+  - &issuerOrg
+    Name: issuerMSP
+    ID: issuerMSP
+    MSPDir: ./crypto-config/peerOrganizations/issuer-net/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('issuerMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('issuerMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('issuerMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('issuerMSP.member')"
+          
+    AnchorPeers:
+      # AnchorPeers defines the location of peers which can be used
+      # for cross org gossip communication.  Note, this value is only
+      # encoded in the genesis block in the Application section context
+      - Host: peer0.issuer-net.staging.intainaabs.emulya.com
+        Port: 8443
+#
+  - &investorOrg
+    Name: investorMSP
+    ID: investorMSP
+    MSPDir: ./crypto-config/peerOrganizations/investor-net/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('investorMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('investorMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('investorMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('investorMSP.member')"
+          
+    AnchorPeers:
+      # AnchorPeers defines the location of peers which can be used
+      # for cross org gossip communication.  Note, this value is only
+      # encoded in the genesis block in the Application section context
+      - Host: peer0.investor-net.staging.intainaabs.emulya.com
+        Port: 8443
+#
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer1.staging.intainabs.emulya.com:8443
+
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 98 MB
+    PreferredMaxBytes: 1024 KB
+  EtcdRaft:
+    Consenters:
+      - Host: orderer1.staging.intainabs.emulya.com
+        Port: 8443
+        ClientTLSCert: ./crypto-config/ordererOrganizations/intain-net/orderers/orderer1.intain-net/tls/server.crt
+        ServerTLSCert: ./crypto-config/ordererOrganizations/intain-net/orderers/orderer1.intain-net/tls/server.crt
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+  Capabilities:
+    <<: *OrdererCapabilities
+#
+Profiles:
+  IntainGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      OrdererType: etcdraft
+      EtcdRaft:
+        Consenters:
+        - Host: orderer1.staging.intainabs.emulya.com
+          Port: 8443
+          ClientTLSCert: ./crypto-config/ordererOrganizations/intain-net/orderers/orderer1.intain-net/tls/server.crt
+          ServerTLSCert: ./crypto-config/ordererOrganizations/intain-net/orderers/orderer1.intain-net/tls/server.crt
+      Organizations:
+        - *intainOrg
+    Consortiums:
+      IntainConsortium:
+        Organizations:
+          - *orginatorOrg
+          - *issuerOrg
+          - *investorOrg
+  IntainChannel:
+    <<: *ChannelDefaults
+    Consortium: IntainConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *orginatorOrg
+        - *issuerOrg
+        - *investorOrg
+#
