@@ -1,0 +1,51 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: channel-originator
+  namespace: originator-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: channel-originator
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/create_channel   
+  values:
+    metadata:
+      namespace: originator-net
+      network:
+        version 2.2.0
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.originator-net:7051
+      localmspid: originatorMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: originator-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/originator-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/originator-net/orderer 
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: intainchannel
+    orderer:
+      address: orderer1.ordorg-net:7050
+    channeltx: |-
+      CvIDChsKGQgCGgYIv/Pm/AUiDWludGFpbmNoYW5uZWwS0gMKzwMKDWludGFpbmNoYW5uZWwSVBJC
+      CgtBcHBsaWNhdGlvbhIzEg8KC2ludmVzdG9yTVNQEgASEQoNb3JpZ2luYXRvck1TUBIAEg0KCWlz
+      c3Vlck1TUBIAGg4KCkNvbnNvcnRpdW0SABrnAhLAAgoLQXBwbGljYXRpb24SsAIIARIRCg1vcmln
+      aW5hdG9yTVNQEgASDQoJaXNzdWVyTVNQEgASDwoLaW52ZXN0b3JNU1ASABokCgxDYXBhYmlsaXRp
+      ZXMSFBIKCggKBFYyXzASABoGQWRtaW5zIiIKB1JlYWRlcnMSFxINCAMSCQoHUmVhZGVycxoGQWRt
+      aW5zIiIKB1dyaXRlcnMSFxINCAMSCQoHV3JpdGVycxoGQWRtaW5zIiIKBkFkbWlucxIYEg4IAxIK
+      CgZBZG1pbnMQAhoGQWRtaW5zIioKC0VuZG9yc2VtZW50EhsSEQgDEg0KC0VuZG9yc2VtZW50GgZB
+      ZG1pbnMiMwoUTGlmZWN5Y2xlRW5kb3JzZW1lbnQSGxIRCAMSDQoLRW5kb3JzZW1lbnQaBkFkbWlu
+      cyoGQWRtaW5zGiIKCkNvbnNvcnRpdW0SFBISChBJbnRhaW5Db25zb3J0aXVt
