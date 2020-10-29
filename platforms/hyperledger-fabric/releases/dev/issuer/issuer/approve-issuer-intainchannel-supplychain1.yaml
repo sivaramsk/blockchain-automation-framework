@@ -1,0 +1,44 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: approve-issuer-intainchannel-supplychain1
+  namespace: issuer-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: approve-issuer-intainchannel-supplychain1
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/approve_chaincode
+  values:
+    metadata:
+      namespace: issuer-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.issuer-net:7051
+      localmspid: issuerMSP
+      loglevel: debug
+      tlsstatus: true
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: issuer-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/issuer-net/users/admin 
+      orderersecretprefix: secret/crypto/peerOrganizations/issuer-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    orderer:
+      address: orderer1.intain-net:7050
+    chaincode:
+      builder: hyperledger/fabric-ccenv:2.2.0
+      name: supplychain
+      version: 1
+      commitarguments: '\"init\",\"\"'
+      endorsementpolicies:  ''
+    channel:
+      name: intainchannel
