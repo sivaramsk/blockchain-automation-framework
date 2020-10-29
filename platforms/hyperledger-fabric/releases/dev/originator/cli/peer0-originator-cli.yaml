@@ -1,0 +1,38 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: peer0-originator-cli
+  namespace: originator-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: peer0-originator-cli
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: originator-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: originatorsc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: originator-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/originator-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/originator-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer0
+      localmspid: originatorMSP
+      tlsstatus: true
+      address: peer0.originator-net:7051
+    orderer:
+      address: orderer1.intain-net:7050
