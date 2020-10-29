@@ -46,79 +46,104 @@ Channel: &ChannelDefaults
 Organizations:
 
 #
-  - &ordorgOrg
-    Name: ordorgMSP
-    ID: ordorgMSP
-    MSPDir: ./crypto-config/ordererOrganizations/ordorg-net/msp
+  - &intainOrg
+    Name: intainMSP
+    ID: intainMSP
+    MSPDir: ./crypto-config/ordererOrganizations/intain-net/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('ordorgMSP.member')"
+        Rule: "OR('intainMSP.member')"
       Writers:
         Type: Signature
-        Rule: "OR('ordorgMSP.member')"
+        Rule: "OR('intainMSP.member')"
       Admins:
         Type: Signature
-        Rule: "OR('ordorgMSP.admin')"
+        Rule: "OR('intainMSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('ordorgMSP.member')"
+        Rule: "OR('intainMSP.member')"
     
 #
-  - &org1Org
-    Name: org1MSP
-    ID: org1MSP
-    MSPDir: ./crypto-config/peerOrganizations/org1-net/msp
+  - &originatorOrg
+    Name: originatorMSP
+    ID: originatorMSP
+    MSPDir: ./crypto-config/peerOrganizations/originator-net/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('org1MSP.member')"
+        Rule: "OR('originatorMSP.member')"
       Writers:
         Type: Signature
-        Rule: "OR('org1MSP.member')"
+        Rule: "OR('originatorMSP.member')"
       Admins:
         Type: Signature
-        Rule: "OR('org1MSP.admin')"
+        Rule: "OR('originatorMSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('org1MSP.member')"
+        Rule: "OR('originatorMSP.member')"
           
     AnchorPeers:
       # AnchorPeers defines the location of peers which can be used
       # for cross org gossip communication.  Note, this value is only
       # encoded in the genesis block in the Application section context
-      - Host: peer0.org1-net.staging.kluster.emulya.com
+      - Host: peer0.originator-net.staging.intainabs.emulya.com
         Port: 8443
 #
-  - &org2Org
-    Name: org2MSP
-    ID: org2MSP
-    MSPDir: ./crypto-config/peerOrganizations/org2-net/msp
+  - &issuerOrg
+    Name: issuerMSP
+    ID: issuerMSP
+    MSPDir: ./crypto-config/peerOrganizations/issuer-net/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('org2MSP.member')"
+        Rule: "OR('issuerMSP.member')"
       Writers:
         Type: Signature
-        Rule: "OR('org2MSP.member')"
+        Rule: "OR('issuerMSP.member')"
       Admins:
         Type: Signature
-        Rule: "OR('org2MSP.admin')"
+        Rule: "OR('issuerMSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('org2MSP.member')"
+        Rule: "OR('issuerMSP.member')"
           
     AnchorPeers:
       # AnchorPeers defines the location of peers which can be used
       # for cross org gossip communication.  Note, this value is only
       # encoded in the genesis block in the Application section context
-      - Host: peer0.org2-net.staging.kluster.emulya.com
+      - Host: peer0.issuer-net.staging.intainabs.emulya.com
+        Port: 8443
+#
+  - &investorOrg
+    Name: investorMSP
+    ID: investorMSP
+    MSPDir: ./crypto-config/peerOrganizations/investor-net/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('investorMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('investorMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('investorMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('investorMSP.member')"
+          
+    AnchorPeers:
+      # AnchorPeers defines the location of peers which can be used
+      # for cross org gossip communication.  Note, this value is only
+      # encoded in the genesis block in the Application section context
+      - Host: peer0.investor-net.staging.intainabs.emulya.com
         Port: 8443
 #
 Orderer: &OrdererDefaults
   OrdererType: etcdraft
   Addresses:
-    - orderer1.staging.kluster.emulya.com:8443
+    - orderer1.staging.intainabs.emulya.com:8443
 
   BatchTimeout: 2s
   BatchSize:
@@ -127,10 +152,10 @@ Orderer: &OrdererDefaults
     PreferredMaxBytes: 1024 KB
   EtcdRaft:
     Consenters:
-      - Host: orderer1.staging.kluster.emulya.com
+      - Host: orderer1.staging.intainabs.emulya.com
         Port: 8443
-        ClientTLSCert: ./crypto-config/ordererOrganizations/ordorg-net/orderers/orderer1.ordorg-net/tls/server.crt
-        ServerTLSCert: ./crypto-config/ordererOrganizations/ordorg-net/orderers/orderer1.ordorg-net/tls/server.crt
+        ClientTLSCert: ./crypto-config/ordererOrganizations/intain-net/orderers/orderer1.intain-net/tls/server.crt
+        ServerTLSCert: ./crypto-config/ordererOrganizations/intain-net/orderers/orderer1.intain-net/tls/server.crt
   Organizations:
   Policies:
     Readers:
@@ -156,23 +181,25 @@ Profiles:
       OrdererType: etcdraft
       EtcdRaft:
         Consenters:
-        - Host: orderer1.staging.kluster.emulya.com
+        - Host: orderer1.staging.intainabs.emulya.com
           Port: 8443
-          ClientTLSCert: ./crypto-config/ordererOrganizations/ordorg-net/orderers/orderer1.ordorg-net/tls/server.crt
-          ServerTLSCert: ./crypto-config/ordererOrganizations/ordorg-net/orderers/orderer1.ordorg-net/tls/server.crt
+          ClientTLSCert: ./crypto-config/ordererOrganizations/intain-net/orderers/orderer1.intain-net/tls/server.crt
+          ServerTLSCert: ./crypto-config/ordererOrganizations/intain-net/orderers/orderer1.intain-net/tls/server.crt
       Organizations:
-        - *ordorgOrg
+        - *intainOrg
     Consortiums:
-      MyConsortium:
+      IntainConsortium:
         Organizations:
-          - *org1Org
-          - *org2Org
-  AllChannel:
+          - *originatorOrg
+          - *issuerOrg
+          - *investorOrg
+  IntainChannel:
     <<: *ChannelDefaults
-    Consortium: MyConsortium
+    Consortium: IntainConsortium
     Application:
       <<: *ApplicationDefaults
       Organizations:
-        - *org1Org
-        - *org2Org
+        - *originatorOrg
+        - *issuerOrg
+        - *investorOrg
 #
