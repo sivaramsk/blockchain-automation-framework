@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }} 
     {{- include "labels.custom" . | nindent 2 }}
 spec:
-  storageClassName: standard
+  storageClassName: {{ $.Values.storage.storageclassname }}
   accessModes:
     - ReadWriteOnce
   resources:
