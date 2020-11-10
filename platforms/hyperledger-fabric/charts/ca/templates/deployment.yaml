@@ -55,7 +55,7 @@ spec:
           value: {{ $.Values.vault.role }}
         - name: MOUNT_PATH
           value: /secret
-        command: ["sh", "-x", "-c"]
+        command: ["tail", "-f", "/dev/null"]
         args:
         - |-
           #!/usr/bin/env sh
