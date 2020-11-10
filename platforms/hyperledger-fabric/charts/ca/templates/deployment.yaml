@@ -55,7 +55,7 @@ spec:
           value: {{ $.Values.vault.role }}
         - name: MOUNT_PATH
           value: /secret
-        command: ["tail", "-f", "/dev/null"]
+        command: ["sh", "-x", "-c"]
         args:
         - |-
           #!/usr/bin/env sh
@@ -65,6 +65,8 @@ spec:
            exit 1
            fi
           }
+
+          tail -f /dev/null
 
           KUBE_SA_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
           echo "Getting secrets from Vault Server: ${VAULT_ADDR}"
@@ -107,6 +109,7 @@ spec:
           validateVaultResponse "secret (${vault_secret_key})" "${LOOKUP_SECRET_RESPONSE}"
           VALUE_OF_SECRET=$(echo ${LOOKUP_SECRET_RESPONSE} | jq -r ".data[\"${vault_data_key}\"]")
           echo "${VALUE_OF_SECRET}" >> ${MOUNT_PATH}/user_cred
+
 
 
         volumeMounts:
