@@ -1,12 +1,12 @@
-apiVersion: flux.weave.works/v1beta1
+apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
-  name: channel-{{ org.name | lower }}
+  name: createchannel-{{component_name}}-{{ org.name | lower }}
   namespace: {{ component_ns }}
   annotations:
-    flux.weave.works/automated: "false"
+    fluxcd.io/automated: "false"
 spec:
-  releaseName: channel-{{ org.name | lower }}
+  releaseName: createchannel-{{ component_name }}-{{ org.name | lower }}
   chart:
     git: {{ git_url }}
     ref: {{ git_branch }}
