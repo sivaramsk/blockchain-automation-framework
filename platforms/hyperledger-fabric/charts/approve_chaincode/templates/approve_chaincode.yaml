@@ -124,7 +124,7 @@ spec:
         imagePullPolicy: Always
         stdin: true
         tty: true
-        command: ["sh", "-c"]
+        command: ["sh", "-x", "-c"]
         args:
         - |-
           #!/bin/bash sh
