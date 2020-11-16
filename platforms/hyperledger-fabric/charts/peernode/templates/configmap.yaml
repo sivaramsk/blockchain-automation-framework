@@ -35,6 +35,9 @@ data:
   GODEBUG: "netdns=go"
   CORE_PEER_GOSSIP_SKIPHANDSHAKE: "true"
   CORE_CHAINCODE_BUILDER: "{{ $.Values.peer.builder }}"
+  CORE_CHAINCODE_EXTERNALBUILDERS_NAME: "external-builder"
+  CORE_CHAINCODE_EXTERNALBUILDERS_PATH: "/builders/external"
+  CORE_CHAINCODE_EXTERNALBUILDERS_ENVIRONMENTWHITELIST: "["GOPROXY"]"
 ---
 apiVersion: v1
 kind: ConfigMap
