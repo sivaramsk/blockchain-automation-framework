@@ -124,10 +124,10 @@ spec:
         imagePullPolicy: Always
         stdin: true
         tty: true
-        command: ["sh", "-x", "-c"]
+        command: ["sh", "-c"]
         args:
         - |-
-          #!/bin/bash sh
+          #!/bin/bash sh -x
           echo $COMMIT_ARGUMENTS>COMMIT_ARGUMENTS.txt
           COMMIT_ARGUMENTS=$(< COMMIT_ARGUMENTS.txt)
           
