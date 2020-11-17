@@ -228,7 +228,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ $.Values.storage.peer.storagesize }}
+          storage: 1Gi
   - metadata:
       name: datadir-couchdb     
     spec:
@@ -236,4 +236,4 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ $.Values.storage.couchdb.storagesize }}
+          storage: 1Gi

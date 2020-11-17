@@ -216,4 +216,4 @@ spec:
       storageClassName: {{ $.Values.storage.storageclassname }}
       resources:
         requests:
-          storage: {{ $.Values.storage.storagesize }}
+          storage: 1Gi
