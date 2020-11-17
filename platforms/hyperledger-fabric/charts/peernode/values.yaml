@@ -76,7 +76,7 @@ storage:
     storageclassname:
     #Provide the storagesize for storage class
     #Eg. storagesize: 512Mi
-    storagesize: 1G
+    storagesize: 1Gi
 
 
 
