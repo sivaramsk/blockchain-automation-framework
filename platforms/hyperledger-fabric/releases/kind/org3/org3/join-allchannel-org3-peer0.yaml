@@ -1,0 +1,41 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: joinchannel-peer0-join-allchannel-org3-peer0
+  namespace: org3-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: joinchannel-peer0-join-allchannel-org3-peer0
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: kind
+    path: platforms/hyperledger-fabric/charts/join_channel
+  values:
+    metadata:
+      namespace: org3-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.org3-net:7051
+      localmspid: org3MSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://do-vault.eastus.azurecontainer.io:8200
+      authpath: org3-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/org3-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/org3-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: allchannel      
+    orderer:
+      address: orderer1.ordorg-net:7050
+

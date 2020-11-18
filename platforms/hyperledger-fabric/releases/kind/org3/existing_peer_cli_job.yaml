@@ -1,0 +1,24 @@
+metadata:
+  namespace: org3-net
+  images:
+    fabrictools: hyperledger/fabric-tools:2.2.0
+    alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+storage:
+  class: org3sc
+  size: 256Mi
+vault:
+  role: vault-role
+  address: http://do-vault.eastus.azurecontainer.io:8200
+  authpath: org3-net-auth
+  adminsecretprefix: secret/crypto/peerOrganizations/org3-net/users/admin
+  orderersecretprefix: secret/crypto/peerOrganizations/org3-net/orderer
+  serviceaccountname: vault-auth
+  imagesecretname: regcred
+  tls: false
+peer:
+  name: peer0
+  localmspid: org3MSP
+  tlsstatus: true
+  address: peer0.org3-net:7051
+orderer:
+  address: orderer1.ordorg-net:7050
