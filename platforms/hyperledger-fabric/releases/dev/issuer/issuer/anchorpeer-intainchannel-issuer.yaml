@@ -1,0 +1,49 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: anchorpeer-intainchannel-issuer
+  namespace: issuer-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: anchorpeer-intainchannel-issuer
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/anchorpeer
+  values:
+    metadata:
+      namespace: issuer-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.issuer-net:7051
+      localmspid: issuerMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: issuer-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/issuer-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/issuer-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: intainchannel      
+    orderer:
+      address: orderer1.intain-net:7050
+    anchorstx: |-
+      CtgCChsKGQgCGgYIsv3p/AUiDWludGFpbmNoYW5uZWwSuAIKtQIKDWludGFpbmNoYW5uZWwSYhJg
+      CgtBcHBsaWNhdGlvbhJRCAESTQoJaXNzdWVyTVNQEkAaBwoDTVNQEgAiCwoHV3JpdGVycxIAIgoK
+      BkFkbWlucxIAIg8KC0VuZG9yc2VtZW50EgAiCwoHUmVhZGVycxIAGr8BErwBCgtBcHBsaWNhdGlv
+      bhKsAQgBEqcBCglpc3N1ZXJNU1ASmQEIARpNCgtBbmNob3JQZWVycxI+EjQKMgotcGVlcjAuaXNz
+      dWVyLW5ldC5zdGFnaW5nLmludGFpbmFicy5lbXVseWEuY29tEPtBGgZBZG1pbnMaBwoDTVNQEgAi
+      DwoLRW5kb3JzZW1lbnQSACILCgdSZWFkZXJzEgAiCwoHV3JpdGVycxIAIgoKBkFkbWlucxIAKgZB
+      ZG1pbnM=
+

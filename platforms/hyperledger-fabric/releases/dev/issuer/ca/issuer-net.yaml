@@ -1,0 +1,43 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: issuer-net-ca
+  namespace: issuer-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: issuer-net-ca
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: issuer-net
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+    server:
+      name: ca
+      tlsstatus: true
+      admin: issuer-admin
+    storage:
+      storageclassname: issuersc
+      storagesize: 512Mi
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: issuer-net-auth
+      secretcert: secret/crypto/peerOrganizations/issuer-net/ca?ca.issuer-net-cert.pem
+      secretkey: secret/crypto/peerOrganizations/issuer-net/ca?issuer-net-CA.key
+      secretadminpass: secret/credentials/issuer-net/ca/issuer?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: peer

@@ -5,12 +5,12 @@ metadata:
   name: ca-tools-crypto-pvc
   namespace: {{ $.Values.metadata.namespace }}
 spec:
-  storageClassName: default
+  storageClassName: do-block-storage
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ $.Values.storage.storagesize }}
+      storage: 1Gi
 
 ---
 apiVersion: v1
@@ -19,10 +19,10 @@ metadata:
   name: ca-tools-pvc
   namespace: {{ $.Values.metadata.namespace }}
 spec:
-  storageClassName: default
+  storageClassName: do-block-storage
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ $.Values.storage.storagesize }}
+      storage: 1Gi
 

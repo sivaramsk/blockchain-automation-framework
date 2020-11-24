@@ -1,0 +1,38 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: peer0-issuer-cli
+  namespace: issuer-net
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: peer0-issuer-cli
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: try2
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: issuer-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: issuersc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://vault-test.eastus.azurecontainer.io:8200
+      authpath: issuer-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/issuer-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/issuer-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer0
+      localmspid: issuerMSP
+      tlsstatus: true
+      address: peer0.issuer-net:7051
+    orderer:
+      address: orderer1.intain-net:7050

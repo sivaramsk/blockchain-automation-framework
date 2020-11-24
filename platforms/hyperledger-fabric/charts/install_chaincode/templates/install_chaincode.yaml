@@ -16,6 +16,10 @@ spec:
     metadata:
       labels:
         app: installchaincode-{{ $.Values.peer.name }}-{{ $.Values.chaincode.name }}-{{ $.Values.chaincode.version }}
+        app.kubernetes.io/name: installchaincode-{{ $.Values.chaincode.name }}{{ $.Values.chaincode.version }}
+        helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       restartPolicy: OnFailure
       serviceAccountName: {{ $.Values.vault.serviceaccountname }}
@@ -137,7 +141,7 @@ spec:
         imagePullPolicy: Always
         stdin: true
         tty: true
-        command: ["sh", "-c"]
+        command: ["sh", "-x", "-c"]
         args:
         - |-
           #!/bin/bash sh
@@ -191,6 +195,14 @@ spec:
             CC_SRC_PATH=$CC_SRC_PATH/build/install/${CHAINCODE_NAME}
 
             echo $CC_SRC_PATH
+          elif [ ${CC_RUNTIME_LANGUAGE} = "node" ]
+          then
+            ## Copying desired chaincode to a location relative to $GOPATH/src
+            mkdir -p $GOPATH/src/github.com/chaincode
+            cp -R /tmp/chaincode/{{ $.Values.chaincode.repository.path }}/* $GOPATH/src/github.com/chaincode/
+
+            #chaincode path
+            CC_SRC_PATH="${GOPATH}/src/github.com/chaincode/${CHAINCODE_NAME}/${CHAINCODE_MAINDIR}"
           fi
           version1_4=`echo $NETWORK_VERSION | grep -c 1.4`
           if [ $version1_4 = 1 ];then
