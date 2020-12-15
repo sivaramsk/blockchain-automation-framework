@@ -1,0 +1,63 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: investor-peer0
+  namespace: investor-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: investor-peer0
+  chart:
+    git: git@github.com:sivaramkannan/blockchain-automation-framework.git
+    ref: intainabs-demo
+    path: platforms/hyperledger-fabric/charts/peernode    
+  values:
+    metadata:
+      namespace: investor-net
+      images:
+        couchdb: hyperledger/fabric-couchdb:0.4.18
+        peer: hyperledger/fabric-peer:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.investor-net:7051
+      gossipexternalendpoint: peer0.investor-net.investor-net.staging.intainabs.emulya.com:8443
+      localmspid: investorMSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.2.0
+      couchdb:
+        username: investor-user
+
+    storage:
+      peer:
+        storageclassname: investorsc
+        storagesize: 10Gi
+      couchdb:
+        storageclassname: investorsc
+        storagesize: 10Gi
+
+    vault:
+      role: vault-role
+      address: http://159.65.153.150:8200
+      authpath: investor-net-auth
+      secretprefix: secret/crypto/peerOrganizations/investor-net/peers/peer0.investor-net
+      secretambassador: secret/crypto/peerOrganizations/investor-net/ambassador
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretcouchdbpass: secret/credentials/investor-net/couchdb/investor?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+          
+    proxy:
+      provider: haproxy
+      external_url_suffix: investor-net.staging.intainabs.emulya.com
