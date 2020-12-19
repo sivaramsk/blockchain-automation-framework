@@ -1,0 +1,63 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: issuer-peer0
+  namespace: issuer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: issuer-peer0
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: dotest
+    path: platforms/hyperledger-fabric/charts/peernode    
+  values:
+    metadata:
+      namespace: issuer-net
+      images:
+        couchdb: hyperledger/fabric-couchdb:0.4.18
+        peer: hyperledger/fabric-peer:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.issuer-net:7051
+      gossipexternalendpoint: peer0.issuer-net.issuer-net.staging.kluster.emulya.com:8443
+      localmspid: issuerMSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.2.0
+      couchdb:
+        username: issuer-user
+
+    storage:
+      peer:
+        storageclassname: issuersc
+        storagesize: 1Gi
+      couchdb:
+        storageclassname: issuersc
+        storagesize: 1Gi
+
+    vault:
+      role: vault-role
+      address: http://159.89.141.74:8200
+      authpath: issuer-net-auth
+      secretprefix: secret/crypto/peerOrganizations/issuer-net/peers/peer0.issuer-net
+      secretambassador: secret/crypto/peerOrganizations/issuer-net/ambassador
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretcouchdbpass: secret/credentials/issuer-net/couchdb/issuer?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+          
+    proxy:
+      provider: haproxy
+      external_url_suffix: issuer-net.staging.kluster.emulya.com
