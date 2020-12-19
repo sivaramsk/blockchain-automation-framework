@@ -1,0 +1,63 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: originator-peer0
+  namespace: originator-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: originator-peer0
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: dotest
+    path: platforms/hyperledger-fabric/charts/peernode    
+  values:
+    metadata:
+      namespace: originator-net
+      images:
+        couchdb: hyperledger/fabric-couchdb:0.4.18
+        peer: hyperledger/fabric-peer:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.originator-net:7051
+      gossipexternalendpoint: peer0.originator-net.originator-net.staging.kluster.emulya.com:8443
+      localmspid: originatorMSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.2.0
+      couchdb:
+        username: originator-user
+
+    storage:
+      peer:
+        storageclassname: originatorsc
+        storagesize: 1Gi
+      couchdb:
+        storageclassname: originatorsc
+        storagesize: 1Gi
+
+    vault:
+      role: vault-role
+      address: http://159.89.141.74:8200
+      authpath: originator-net-auth
+      secretprefix: secret/crypto/peerOrganizations/originator-net/peers/peer0.originator-net
+      secretambassador: secret/crypto/peerOrganizations/originator-net/ambassador
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretcouchdbpass: secret/credentials/originator-net/couchdb/originator?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+          
+    proxy:
+      provider: haproxy
+      external_url_suffix: originator-net.staging.kluster.emulya.com
