@@ -1,0 +1,24 @@
+metadata:
+  namespace: trustee-net
+images:
+  fabrictools: hyperledger/fabric-tools:2.0
+  alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+storage:
+  class: trusteesc
+  size: 256Mi
+vault:
+  role: vault-role
+  address: http://159.89.141.74:8200
+  authpath: trustee-net-auth
+  adminsecretprefix: secret/crypto/peerOrganizations/trustee-net/users/admin
+  orderersecretprefix: secret/crypto/peerOrganizations/trustee-net/orderer
+  serviceaccountname: vault-auth
+  imagesecretname: regcred
+  tls: false
+peer:
+  name: peer0 
+  localmspid: trusteeMSP
+  tlsstatus: true
+  address: peer0.trustee-net:7051
+orderer:
+  address: orderer1.intain-net:7050
