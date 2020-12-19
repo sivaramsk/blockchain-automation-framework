@@ -1,0 +1,52 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: channel-originator-intainchannel
+  namespace: originator-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: channel-originator-intainchannel
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: dotest
+    path: platforms/hyperledger-fabric/charts/create_channel   
+  values:
+    metadata:
+      namespace: originator-net
+      network:
+        version 2.2.0
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.0
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.originator-net:7051
+      localmspid: originatorMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://159.89.141.74:8200
+      authpath: originator-net-auth
+      adminsecretprefix: secret/crypto/peerOrganizations/originator-net/users/admin
+      orderersecretprefix: secret/crypto/peerOrganizations/originator-net/orderer 
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: intainchannel
+    orderer:
+      address: orderer1.intain-net:7050
+    channeltx: |-
+      CpYEChsKGQgCGgYI1Yv4/gUiDWludGFpbmNoYW5uZWwS9gMK8wMKDWludGFpbmNoYW5uZWwSZBJS
+      CgtBcHBsaWNhdGlvbhJDEg8KC2ludmVzdG9yTVNQEgASDgoKdHJ1c3RlZU1TUBIAEhEKDW9yaWdp
+      bmF0b3JNU1ASABINCglpc3N1ZXJNU1ASABoOCgpDb25zb3J0aXVtEgAa+wIS1AIKC0FwcGxpY2F0
+      aW9uEsQCCAESDwoLaW52ZXN0b3JNU1ASABIOCgp0cnVzdGVlTVNQEgASEQoNb3JpZ2luYXRvck1T
+      UBIAEg0KCWlzc3Vlck1TUBIAGiQKDENhcGFiaWxpdGllcxIUEgoKCAoEVjJfMBIAGgZBZG1pbnMi
+      NQoUTGlmZWN5Y2xlRW5kb3JzZW1lbnQSHRITCAMSDwoLRW5kb3JzZW1lbnQQAhoGQWRtaW5zIiIK
+      B1JlYWRlcnMSFxINCAMSCQoHUmVhZGVycxoGQWRtaW5zIiIKB1dyaXRlcnMSFxINCAMSCQoHV3Jp
+      dGVycxoGQWRtaW5zIiIKBkFkbWlucxIYEg4IAxIKCgZBZG1pbnMQAhoGQWRtaW5zIiwKC0VuZG9y
+      c2VtZW50Eh0SEwgDEg8KC0VuZG9yc2VtZW50EAIaBkFkbWlucyoGQWRtaW5zGiIKCkNvbnNvcnRp
+      dW0SFBISChBJbnRhaW5Db25zb3J0aXVt
