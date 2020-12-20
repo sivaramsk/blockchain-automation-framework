@@ -1,0 +1,43 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: investor-net-ca
+  namespace: investor-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: investor-net-ca
+  chart:
+    git: ssh://git@github.com/sivaramsk/blockchain-automation-framework.git
+    ref: dotest
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: investor-net
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+    server:
+      name: ca
+      tlsstatus: true
+      admin: investor-admin
+    storage:
+      storageclassname: investorsc
+      storagesize: 1Gi
+    vault:
+      role: vault-role
+      address: http://159.89.141.74:8200
+      authpath: investor-net-auth
+      secretcert: secret/crypto/peerOrganizations/investor-net/ca?ca.investor-net-cert.pem
+      secretkey: secret/crypto/peerOrganizations/investor-net/ca?investor-net-CA.key
+      secretadminpass: secret/credentials/investor-net/ca/investor?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: peer
