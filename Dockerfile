@@ -45,6 +45,9 @@ RUN rm /etc/apt/apt.conf.d/docker-clean
 RUN mkdir /etc/ansible/
 RUN /bin/echo -e "[ansible_provisioners:children]\nlocal\n[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
 
+# Install Flux V2
+RUN curl -s https://fluxcd.io/install.sh | bash
+
 # Copy the provisional script to build container
 COPY ./run.sh /home
 COPY ./reset.sh /home
