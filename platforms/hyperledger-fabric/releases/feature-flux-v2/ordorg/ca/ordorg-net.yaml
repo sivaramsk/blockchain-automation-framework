@@ -1,0 +1,44 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: ordorg-net-ca
+  namespace: ordorg-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: ordorg-net-ca
+  chart:
+    git: https://github.com/sivaramsk/blockchain-automation-framework.git
+    ref: feature-flux-v2
+    path: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: ordorg-net
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+    server:
+      name: ca
+      tlsstatus: true
+      admin: ordorg-admin
+    storage:
+      storageclassname: ordorgsc
+      storagesize: 512Mi 
+    vault:
+      role: vault-role
+      address: http://fluxv2vault.eastus.cloudapp.azure.com:8200
+      authpath: devordorg-net-auth
+      secretcert: secret/crypto/ordererOrganizations/ordorg-net/ca?ca.ordorg-net-cert.pem
+      secretkey: secret/crypto/ordererOrganizations/ordorg-net/ca?ordorg-net-CA.key
+      secretadminpass: secret/credentials/ordorg-net/ca/ordorg?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: orderer
+      external_url_suffix: ordorg.org1ambassador.blockchaincloudpoc.com
